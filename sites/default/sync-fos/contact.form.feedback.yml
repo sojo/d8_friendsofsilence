@@ -1,0 +1,12 @@
+uuid: 6eeaa68b-6632-4802-b708-08a84b275762
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: c4zaT5cyPxuTXI6JOWt3qRtMvICT9tHB6d9a5VG-CmQ
+id: feedback
+label: 'Website feedback'
+recipients:
+  - bob.sabath@gmail.com
+reply: ''
+weight: 0

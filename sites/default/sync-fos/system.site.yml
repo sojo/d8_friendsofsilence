@@ -1,0 +1,14 @@
+uuid: feda7ed0-93fb-4e73-bf08-8dd91b3aba3d
+name: 'Friends of Silence 2'
+mail: bob.sabath@gmail.com
+slogan: ''
+page:
+  403: ''
+  404: ''
+  front: /node/1
+admin_compact_mode: false
+weight_select_max: 100
+langcode: en
+default_langcode: en
+_core:
+  default_config_hash: yXadRE77Va-G6dxhd2kPYapAvbnSvTF6hO4oXiOEynI

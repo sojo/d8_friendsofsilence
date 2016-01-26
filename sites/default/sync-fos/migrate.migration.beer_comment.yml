@@ -1,0 +1,57 @@
+uuid: 54b1e836-a70a-453d-8901-1ad6ed956104
+langcode: en
+status: true
+dependencies:
+  config:
+    - migrate.migration.beer_node
+    - migrate.migration.beer_user
+  module:
+    - comment
+    - migrate_example
+    - migrate_plus
+third_party_settings:
+  migrate_plus:
+    migration_group: beer
+_core:
+  default_config_hash: HwRN5oLP3rbpaznnffwGcGReqwMXCGFRBjwNpVXDSAY
+id: beer_comment
+migration_tags: null
+label: 'Comments on beers'
+source:
+  plugin: beer_comment
+process:
+  pid:
+    plugin: migration
+    migration: beer_comment
+    source: cid_parent
+  entity_id:
+    plugin: migration
+    migration: beer_node
+    source: bid
+  entity_type:
+    plugin: default_value
+    default_value: node
+  field_name:
+    plugin: default_value
+    default_value: field_comments
+  comment_type:
+    plugin: default_value
+    default_value: node_comments
+  subject: subject
+  uid:
+    plugin: migration
+    migration: beer_user
+    source: aid
+  name: name
+  mail: mail
+  status:
+    plugin: default_value
+    default_value: 1
+  comment_body/value: body
+destination:
+  plugin: 'entity:comment'
+template: null
+migration_dependencies:
+  required:
+    - beer_node
+    - beer_user
