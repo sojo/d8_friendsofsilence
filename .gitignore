@@ -1,0 +1,22 @@
+# Ignore configuration files that may contain sensitive information.
+sites/*/settings*.php
+
+# Ignore paths that contain user-generated content.
+sites/*/files
+sites/*/private
+
+.DS_Store
+.sass-cache
+sites/all/themes/*/.sass-cache
+
+sites/default/local.settings.php
+
+
+*.sql.gz
+*.tgz
+# Ignore module tarballs.
+sites/all/modules/*.tar.gz
+sites/all/modules/custom/*.tar.gz
+
+# Ignore MAMP log file
+MAMP_php_error_log_MAMP
