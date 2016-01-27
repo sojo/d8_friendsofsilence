@@ -1,0 +1,22 @@
+uuid: b54858df-94e3-446a-9d3d-6184afe935db
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - fos
+_core:
+  default_config_hash: 8I8iACSa0sKO3k3jlvUG1ge52rfcKX7USJAQYnzuBgg
+id: fos_help
+theme: fos
+region: content
+weight: -7
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  provider: help
+  label_display: '0'
+visibility: {  }

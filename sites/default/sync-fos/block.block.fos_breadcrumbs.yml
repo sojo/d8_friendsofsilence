@@ -1,0 +1,22 @@
+uuid: 04d87ccb-c4ad-415b-9401-1d3eee35e315
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - fos
+_core:
+  default_config_hash: oXUb3JZR2WW5VOdw4HrhRicCsq51mCgLfRyvheG68ck
+id: fos_breadcrumbs
+theme: fos
+region: header
+weight: -5
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  provider: system
+  label_display: '0'
+visibility: {  }

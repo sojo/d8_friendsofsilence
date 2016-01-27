@@ -1,0 +1,22 @@
+uuid: e1695e26-78ca-442c-8500-ac6cd07e9ed1
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - fos
+_core:
+  default_config_hash: KHQIJ7Vfl25lTjzIc7qIvnuistt-Mw2O0kG4jCofmkI
+id: fos_messages
+theme: fos
+region: highlighted
+weight: 0
+provider: null
+plugin: system_messages_block
+settings:
+  id: system_messages_block
+  label: 'Status messages'
+  provider: system
+  label_display: '0'
+visibility: {  }

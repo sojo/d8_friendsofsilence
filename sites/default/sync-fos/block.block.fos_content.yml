@@ -1,0 +1,22 @@
+uuid: 828357b4-62e6-4fc3-b600-dc6ca7b761fb
+langcode: en
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - fos
+_core:
+  default_config_hash: 9EoWV2Lot6FVSr50t4hoKgiz1LIXYWNG-IIPYsWxBqo
+id: fos_content
+theme: fos
+region: content
+weight: 0
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  provider: system
+  label_display: '0'
+visibility: {  }

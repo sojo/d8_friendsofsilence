@@ -1,0 +1,20 @@
+uuid: be8883f8-868e-4783-a600-e9097e40e95c
+langcode: en
+status: true
+dependencies:
+  theme:
+    - fos
+_core:
+  default_config_hash: 13GQpeITIJsp1kyPniXtWZfyFH87vb1xxJCHifL4UeE
+id: fos_local_actions
+theme: fos
+region: content
+weight: -7
+provider: null
+plugin: local_actions_block
+settings:
+  id: local_actions_block
+  label: 'Primary admin actions'
+  provider: core
+  label_display: '0'
+visibility: {  }
