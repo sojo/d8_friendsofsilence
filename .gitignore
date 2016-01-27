@@ -3,6 +3,8 @@ sites/*/settings*.php
 sites/*/services.yml
 sites/*/development.services.yml
 
+node_modules
+
 
 # Ignore paths that contain user-generated content.
 sites/*/files
