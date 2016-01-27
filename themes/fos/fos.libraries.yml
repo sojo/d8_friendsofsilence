@@ -1,0 +1,10 @@
+global:
+  version: VERSION
+  css:
+    base:
+      css/fos.css: {}
+  js:
+    js/fos.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
