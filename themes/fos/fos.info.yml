@@ -1,4 +1,4 @@
-name: fos
+name: Friends of Silence
 description: "Custom sub-theme, inherits from the Foundation base theme read <a href=\"http://foundation.zurb.com/docs/index.php\">framework documentation</a>"
 core: 8.x
 type: theme
