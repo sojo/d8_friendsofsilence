@@ -55,7 +55,5 @@ function migrate_plus_migration_load($migrations) {
  * Implements hook_migrate_prepare_row().
  */
 function migrate_plus_migrate_prepare_row(Row $row, MigrateSourceInterface $source, MigrationInterface $migration) {
-  // We will not encourage unnecessary coupling to Migration entities by passing
-  // them on.
-  \Drupal::service('event_dispatcher')->dispatch(MigrateEvents::PREPARE_ROW, new MigratePrepareRowEvent($row, $source));
+  \Drupal::service('event_dispatcher')->dispatch(MigrateEvents::PREPARE_ROW, new MigratePrepareRowEvent($row, $source, $migration));
 }

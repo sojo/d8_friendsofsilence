@@ -47,7 +47,7 @@ class MigrationGroupListBuilder extends ConfigEntityListBuilder {
    * @see Drupal\Core\Entity\EntityListController::render()
    */
   public function buildRow(EntityInterface $entity) {
-    $row['label'] = $this->label();
+    $row['label'] = $entity->label();
     $row['machine_name'] = $entity->id();
     $row['description'] = $entity->get('description');
     $row['source_type'] = $entity->get('source_type');
