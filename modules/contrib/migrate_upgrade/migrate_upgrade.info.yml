@@ -6,12 +6,13 @@ package: Core (Experimental)
 # core: 8.x
 configure: migrate_upgrade.upgrade
 dependencies:
+  - system (<8.1)
   - migrate
   - migrate_drupal
   - dblog
 
-# Information added by Drupal.org packaging script on 2016-02-11
-version: '8.x-1.x-dev'
+# Information added by Drupal.org packaging script on 2016-03-05
+version: '8.x-1.0'
 core: '8.x'
 project: 'migrate_upgrade'
-datestamp: 1455152643
+datestamp: 1457207340
