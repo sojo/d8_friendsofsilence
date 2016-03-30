@@ -19,32 +19,49 @@ backup_migrate.profile.*:
       type: string
       label: 'Timestamp Format'
 
-backup_migrate.schedule.*:
+backup_migrate.backup_migrate_schedule.*:
   type: config_entity
-  label: 'Backup and Migrate schedule'
+  label: 'Backup and Migrate Schedule'
   mapping:
-    name:
+    id:
       type: string
+      label: 'ID'
     label:
       type: label
-      label: 'Label'
+      label: 'Schedule Name'
+    uuid:
+      type: string
+    enabled:
+      type: boolean
+      label: 'Enabled'
+    keep:
+      type: integer
+      label: 'Backups to keep'
+    period:
+      type: integer
+      label: 'Frequency'
+    cron:
+      type: boolean
+      label: 'Run on cron'
+    source_id:
+      type: string
+      label: 'Source'
+    destination_id:
+      type: string
+      label: 'Destination'
 
-backup_migrate.source.*:
+backup_migrate.backup_migrate_settings.*:
   type: config_entity
-  label: 'Backup and Migrate backup source'
+  label: 'Backup and Migrate Settings Profile'
   mapping:
-    name:
+    id:
       type: string
+      label: 'ID'
     label:
       type: label
       label: 'Label'
-
-backup_migrate.destination.*:
-  type: config_entity
-  label: 'Backup and Migrate backup destination'
-  mapping:
-    name:
+    uuid:
       type: string
-    label:
-      type: label
-      label: 'Label'
+    config:
+      type: mapping
+      label: 'Configuration'

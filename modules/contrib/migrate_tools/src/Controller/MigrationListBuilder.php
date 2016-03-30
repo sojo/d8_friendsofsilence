@@ -7,8 +7,8 @@
 namespace Drupal\migrate_tools\Controller;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
-use Drupal\migrate\Entity\MigrationInterface;
 use Drupal\Core\Entity\EntityHandlerInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Routing\CurrentRouteMatch;
@@ -79,7 +79,7 @@ class MigrationListBuilder extends ConfigEntityListBuilder implements EntityHand
   /**
    * Builds a row for an entity in the entity listing.
    *
-   * @param \Drupal\migrate\Entity\MigrationInterface $migration
+   * @param \Drupal\migrate\Entity\EntityInterface $migration
    *   The entity for which to build the row.
    *
    * @return array
@@ -87,7 +87,7 @@ class MigrationListBuilder extends ConfigEntityListBuilder implements EntityHand
    *
    * @see Drupal\Core\Entity\EntityListController::render()
    */
-  public function buildRow(MigrationInterface $migration) {
+  public function buildRow(EntityInterface $migration) {
     $row['label'] = $migration->label();
     $row['machine_name'] = $migration->id();
     $row['status'] = $migration->getStatusLabel();
@@ -109,8 +109,17 @@ class MigrationListBuilder extends ConfigEntityListBuilder implements EntityHand
     if (!$migration_group) {
       $migration_group = 'default';
     }
-    // @todo: This is most likely not a Best Practice (tm).
-    $row['messages']['data']['#markup'] = '<a href="/admin/structure/migrate/manage/' . $migration_group . '/migrations/' . $migration->id() . '/messages">' . $map->messageCount() .'</a>';
+    $route_parameters = array(
+      'migration_group' => $migration_group,
+      'migration' => $migration->id()
+    );
+    $row['messages'] = array(
+      'data' => array(
+        '#type' => 'link',
+        '#title' => $map->messageCount(),
+        '#url' => Url::fromRoute("migrate_tools.messages", $route_parameters),
+      ),
+    );
     $migrate_last_imported_store = \Drupal::keyValue('migrate_last_imported');
     $last_imported =  $migrate_last_imported_store->get($migration->id(), FALSE);
     if ($last_imported) {
@@ -161,7 +170,7 @@ class MigrationListBuilder extends ConfigEntityListBuilder implements EntityHand
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(MigrationInterface $entity) {
+  public function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
     $migration_group = $entity->getThirdPartySetting('migrate_plus', 'migration_group');
     if (!$migration_group) {

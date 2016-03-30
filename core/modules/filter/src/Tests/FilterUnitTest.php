@@ -862,7 +862,7 @@ www.example.com with a newline in comments -->
    *
    * @param FilterInterface $filter
    *   A input filter object.
-   * @param $tests
+   * @param array $tests
    *   An associative array, whereas each key is an arbitrary input string and
    *   each value is again an associative array whose keys are filter output
    *   strings and whose values are Booleans indicating whether the output is
@@ -933,7 +933,7 @@ www.example.com with a newline in comments -->
         'filter_url_length' => 496,
       )
     ));
-    $path = drupal_get_path('module', 'filter') . '/tests';
+    $path = __DIR__ . '/../../tests';
 
     $input = file_get_contents($path . '/filter.url-input.txt');
     $expected = file_get_contents($path . '/filter.url-output.txt');
@@ -1141,13 +1141,13 @@ body {color:red}
    * Note that this does not remove nulls, new lines and other characters that
    * could be used to obscure a tag or an attribute name.
    *
-   * @param $haystack
+   * @param string $haystack
    *   Text to look in.
-   * @param $needle
+   * @param string $needle
    *   Lowercase, plain text to look for.
-   * @param $message
+   * @param string $message
    *   (optional) Message to display if failed. Defaults to an empty string.
-   * @param $group
+   * @param string $group
    *   (optional) The group this message belongs to. Defaults to 'Other'.
    *
    * @return bool
@@ -1166,13 +1166,13 @@ body {color:red}
    * Note that this does not remove nulls, new lines, and other character that
    * could be used to obscure a tag or an attribute name.
    *
-   * @param $haystack
+   * @param string $haystack
    *   Text to look in.
-   * @param $needle
+   * @param string $needle
    *   Lowercase, plain text to look for.
-   * @param $message
+   * @param string $message
    *   (optional) Message to display if failed. Defaults to an empty string.
-   * @param $group
+   * @param string $group
    *   (optional) The group this message belongs to. Defaults to 'Other'.
    *
    * @return bool
