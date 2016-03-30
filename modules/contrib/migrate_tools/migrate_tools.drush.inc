@@ -5,9 +5,11 @@
  * Command-line tools to aid performing and developing migrations.
  */
 
+use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Unicode;
-use Drupal\migrate\Entity\Migration;
-use Drupal\migrate\Entity\MigrationInterface;
+use Drupal\migrate\Exception\RequirementsException;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate_tools\MigrateExecutable;
 use Drupal\migrate_tools\DrushLogMigrateMessage;
 use Drupal\Core\Datetime\DateFormatter;
@@ -177,8 +179,9 @@ function drush_migrate_tools_migrate_status($migration_names = '') {
         }
       }
       catch (Exception $e) {
-        drush_log(dt('Could not retrieve source count from @migration',
-                      ['@migration' => $migration_id]));
+        drush_print($e->getMessage());
+        drush_log(dt('Could not retrieve source count from @migration: @message',
+          ['@migration' => $migration_id, '@message' => $e->getMessage()]));
         $source_rows = dt('N/A');
         $unprocessed = dt('N/A');
       }
@@ -236,7 +239,7 @@ function drush_migrate_tools_migrate_import($migration_names = '') {
  * Executes a single migration. If the --execute-dependencies option was given,
  * the migration's dependencies will also be executed first.
  *
- * @param \Drupal\migrate\Entity\MigrationInterface $migration
+ * @param \Drupal\migrate\Plugin\MigrationInterface $migration
  *  The migration to execute.
  * @param string $migration_id
  *  The migration ID (not used, just an artifact of array_walk()).
@@ -247,9 +250,11 @@ function _drush_migrate_tools_execute_migration(MigrationInterface $migration, $
   $log = new DrushLogMigrateMessage();
 
   if (drush_get_option('execute-dependencies')) {
-    $required_migrations = \Drupal::entityTypeManager()->getStorage('migration')->loadMultiple($migration->get('requirements'));
+    // @todo: Needs to be redone for migrations-as-plugins.
+    drush_log('The execute-dependencies option is not current supported', 'warning');
+/*    $required_migrations = \Drupal::entityTypeManager()->getStorage('migration')->loadMultiple($migration->get('requirements'));
     $dependency_options = array_merge($options, ['is_dependency' => TRUE]);
-    array_walk($required_migrations, __FUNCTION__, $dependency_options);
+    array_walk($required_migrations, __FUNCTION__, $dependency_options);*/
   }
   if ($options['force']) {
     $migration->set('requirements', []);
@@ -298,8 +303,8 @@ function drush_migrate_tools_migrate_rollback($migration_names = '') {
  * @param string $migration_id
  */
 function drush_migrate_tools_migrate_stop($migration_id = '') {
-  /** @var Migration $migration */
-  $migration = Migration::load($migration_id);
+  /** @var MigrationInterface $migration */
+  $migration = \Drupal::service('plugin.manager.migration')->createInstance($migration_id);
   if ($migration) {
     $status = $migration->getStatus();
     switch ($status) {
@@ -327,8 +332,8 @@ function drush_migrate_tools_migrate_stop($migration_id = '') {
  * @param string $migration_id
  */
 function drush_migrate_tools_migrate_reset_status($migration_id = '') {
-  /** @var Migration $migration */
-  $migration = Migration::load($migration_id);
+  /** @var MigrationInterface $migration */
+  $migration = \Drupal::service('plugin.manager.migration')->createInstance($migration_id);
   if ($migration) {
     $status = $migration->getStatus();
     if ($status == MigrationInterface::STATUS_IDLE) {
@@ -348,8 +353,8 @@ function drush_migrate_tools_migrate_reset_status($migration_id = '') {
  * @param string $migration_id
  */
 function drush_migrate_tools_migrate_messages($migration_id) {
-  /** @var Migration $migration */
-  $migration = Migration::load($migration_id);
+  /** @var MigrationInterface $migration */
+  $migration = \Drupal::service('plugin.manager.migration')->createInstance($migration_id);
   if ($migration) {
     $map = $migration->getIdMap();
     $first = TRUE;
@@ -393,8 +398,8 @@ function drush_migrate_tools_migrate_messages($migration_id) {
  * @param string $migration_id
  */
 function drush_migrate_tools_migrate_fields_source($migration_id) {
-  /** @var Migration $migration */
-  $migration = Migration::load($migration_id);
+  /** @var MigrationInterface $migration */
+  $migration = \Drupal::service('plugin.manager.migration')->createInstance($migration_id);
   if ($migration) {
     $source = $migration->getSourcePlugin();
     $table = [];
@@ -420,18 +425,6 @@ function drush_migrate_tools_migrate_fields_source($migration_id) {
  *   An array keyed by migration group, each value containing an array of migrations.
  */
 function drush_migrate_tools_migration_list($group_id = '', $migration_ids = '') {
-  $query = \Drupal::entityQuery('migration');
-  if ($group_id) {
-    $query->condition('third_party_settings.migrate_plus.migration_group', $group_id);
-  }
-  $names = $query->execute();
-
-  // Order the migrations according to their dependencies.
-  /** @var MigrationInterface[] $migrations */
-  $migrations = \Drupal::entityTypeManager()
-     ->getStorage('migration')
-     ->loadMultiple($names);
-
   if (!empty($migration_ids)) {
     $migration_ids = explode(',', Unicode::strtolower($migration_ids));
   }
@@ -439,17 +432,50 @@ function drush_migrate_tools_migration_list($group_id = '', $migration_ids = '')
     $migration_ids = [];
   }
 
-  $return = [];
-  foreach ($migrations as $migration_id => $migration) {
-    if (empty($migration_ids) || in_array(Unicode::strtolower($migration_id), $migration_ids)) {
-      $group_id = $migration->getThirdPartySetting('migrate_plus', 'migration_group');
-      if (!empty($group_id)) {
-        $return[$group_id][$migration_id] = $migration;
+  /** @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface $manager */
+  $manager = \Drupal::service('plugin.manager.migration');
+  $plugin_definitions = $manager->getDefinitions();
+  $migrations = [];
+  foreach ($plugin_definitions as $plugin_id => $definition) {
+    if (isset($definition['third_party_settings']['migrate_plus']['migration_group'])) {
+      $configured_group_id = $definition['third_party_settings']['migrate_plus']['migration_group'];
+    }
+    else {
+      // @todo: These Drupal-to-Drupal migrations have no Drupal-source-specific
+      // configuration to enable us to skip them in a general way. Explicitly
+      // skip them if they have no explicit group.
+      if ($plugin_id == 'block_content_type' || $plugin_id == 'block_content_body_field') {
+        continue;
       }
-      else {
-        $return['default'][$migration_id] = $migration;
+      $configured_group_id = 'default';
+    }
+    if (empty($group_id) || $group_id == $configured_group_id) {
+      if (empty($migration_ids) || in_array(Unicode::strtolower($plugin_id), $migration_ids)) {
+        try {
+          $migration = $manager->createInstance($plugin_id, $definition);
+          $migration->checkRequirements();
+          $migrations[$configured_group_id][$plugin_id] = $migration;
+        }
+        catch (PluginNotFoundException $e) {
+          // Ignore migrations that are not fully configured.
+        }
+        catch (PluginException $e) {
+          // @todo: Workaround just to catch d6_field* migrations using
+          // CckMigration class.
+        }
+        catch (RequirementsException $e) {
+          // Because migrations are not pre-sorted, we get requirements
+          // exceptions when a migration is instantiated before its
+          // dependencies. For now, trust that they will show up.
+          $migrations[$configured_group_id][$plugin_id] = $migration;
+        }
       }
     }
   }
-  return $return;
+  // As a final step, sort the migrations for each group in dependency order.
+  $result = $migrations;
+  foreach ($migrations as $group_id => $migration_list) {
+    $result[$group_id] = $manager->buildDependencyMigration($migration_list, []);
+  }
+  return $result;
 }
