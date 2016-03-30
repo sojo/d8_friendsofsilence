@@ -1,0 +1,17 @@
+<?php
+$aliases['fosd8prod'] = array(
+  'root' => '/var/www/d8.friendsofsilence.net/htdocs/',
+  'remote-host' => 'friendsofsilence.net',
+  'remote-user' => '677e',
+  'uri' => 'default',
+  'path-aliases' => array(
+    '%drush' => '/usr/local/bin/drush',
+    '%dump-dir' => '/home/677e/drush-dump',
+    '%files' => '/var/www/d8.friendsofsilence.net/htdocs/sites/default/files',
+  ),
+  'command-specific' => array(
+    'sql-sync' => array(
+      'source-dump' => '/home/677e/drush-dump/fosd8.production-sync.sql',
+    ),
+  ),
+);
